@@ -1,0 +1,62 @@
+#!/bin/bash
+# bin/compile <build-dir> <cache-dir> <env-dir>
+
+set -e            # fail fast
+set -o pipefail   # do not ignore exit codes when piping output
+
+# Heroku-provided params
+BUILD_DIR="$1"
+CACHE_DIR="$2"
+ENV_DIR="$3"
+
+DBAPI_VER=${DBAPI_VER:-0.1.0.0}
+
+export_env_dir() {
+  local env_dir=${1:-$ENV_DIR}
+  local whitelist_regex=${2:-''}
+  local blacklist_regex=${3:-'^(PATH|GIT_DIR|CPATH|CPPATH|LD_PRELOAD|LIBRARY_PATH|BUILDPACK_URL)$'}
+
+  if [ -d "$env_dir" ]; then
+    echo "-----> Exporting config vars"
+    for e in $(ls $env_dir); do
+      echo "$e" | grep -E "$whitelist_regex" | grep -qvE "$blacklist_regex" &&
+        echo "       $e" &&
+        export "$e=$(cat $env_dir/$e)"
+      :
+    done
+  fi
+}
+
+export_env_dir
+
+PKG="dbapi-heroku-${DBAPI_VER}"
+
+if [ ! -e $CACHE_DIR/$PKG ]; then
+  BIN_URL="http://bin.begriffs.com/dbapi/${PKG}.tar.xz"
+  if curl --output /dev/null --silent --head --fail $BIN_URL; then
+    echo "-----> Downloading and caching DBAPI $DBAPI_VER binary"
+    mkdir -p $CACHE_DIR/$PKG
+    curl -# -L $BIN_URL | tar xz -C $CACHE_DIR/$PKG
+  else
+    die "-----> Could not find prebuilt $PKG"
+  fi
+else
+  echo "-----> Restoring cached $PKG"
+  cp -R $CACHE_DIR/$PKG/dbapi $BUILD_DIR
+fi
+
+echo "-----> Installing sqitch"
+sudo apt-get install sqitch
+
+echo "-----> Adding sqitch database target"
+sqitch target add heroku_db $DATABASE_URL
+
+echo "-----> Making this target the default"
+sqitch config core.pg.target heroku_db
+
+echo "-----> Creating Procfile"
+cat <<EOF > $BUILD_DIR/Procfile
+./dbapi -p \$PORT -d \$DATABASE_URL -a $ANONYMOUS_ROLE
+EOF
+
+echo "-----> ❤ stay declarative ❤"
