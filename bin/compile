@@ -35,6 +35,7 @@ if [ ! -e $CACHE_DIR/$BIN ]; then
   BIN_URL="http://bin.begriffs.com/dbapi/heroku/${BIN}.tar.xz"
   if curl --output /dev/null --silent --head --fail $BIN_URL; then
     echo "-----> Downloading and caching DBAPI $DBAPI_VER binary"
+    mkdir -p $CACHE_DIR
     curl -# -L $BIN_URL | tar xJ -C $CACHE_DIR
   else
     die "-----> Could not find prebuilt $BIN"
