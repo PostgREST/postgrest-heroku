@@ -29,6 +29,39 @@ export_env_dir() {
 
 export_env_dir
 
+############# Perl + sqitch ###############################
+
+PATH="$BUILD_DIR/local/bin:$PATH"
+
+export PERL5LIB="$BUILD_DIR/local/lib/perl5"
+export PERL_CPANM_OPT="--quiet --notest -l $BUILD_DIR/local"
+
+rm -rf $BUILD_DIR/local
+if [ -d $CACHE_DIR/local ]; then
+  cp -a $CACHE_DIR/local $BUILD_DIR/local
+fi
+
+cd $BUILD_DIR
+
+if ! [ -e $BUILD_DIR/local/bin/cpanm ]; then
+  echo "-----> Bootstrapping cpanm"
+  curl -L --silent https://raw.github.com/miyagawa/cpanminus/master/cpanm | perl - App::cpanminus 2>&1
+fi
+
+echo "-----> Installing dependencies"
+cpanm --installdeps . 2>&1
+
+echo "-----> Installing Sqitch"
+cpanm App::Sqitch DBD::Pg 2>&1
+
+if [ -d $BUILD_DIR/local ]; then
+  rm -rf $CACHE_DIR/local
+  mkdir -p $CACHE_DIR
+  cp -a $BUILD_DIR/local $CACHE_DIR/local
+fi
+
+############# DBAPI BINARY ################################
+
 BIN="dbapi-${DBAPI_VER}"
 
 if [ ! -e $CACHE_DIR/$BIN ]; then
@@ -44,9 +77,6 @@ else
   echo "-----> Restoring cached $BIN"
   cp -R $CACHE_DIR/$BIN $BUILD_DIR
 fi
-
-echo "-----> Installing sqitch"
-cpan -y App::Sqitch DBD::Pg
 
 echo "-----> Adding sqitch database target"
 sqitch target add heroku_db $DATABASE_URL
