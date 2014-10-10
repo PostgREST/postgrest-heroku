@@ -29,20 +29,19 @@ export_env_dir() {
 
 export_env_dir
 
-PKG="dbapi-heroku-${DBAPI_VER}"
+BIN="dbapi-${DBAPI_VER}"
 
-if [ ! -e $CACHE_DIR/$PKG ]; then
-  BIN_URL="http://bin.begriffs.com/dbapi/${PKG}.tar.xz"
+if [ ! -e $CACHE_DIR/$BIN ]; then
+  BIN_URL="http://bin.begriffs.com/dbapi/heroku/${BIN}.tar.xz"
   if curl --output /dev/null --silent --head --fail $BIN_URL; then
     echo "-----> Downloading and caching DBAPI $DBAPI_VER binary"
-    mkdir -p $CACHE_DIR/$PKG
-    curl -# -L $BIN_URL | tar xz -C $CACHE_DIR/$PKG
+    curl -# -L $BIN_URL | tar xJ -C $CACHE_DIR
   else
-    die "-----> Could not find prebuilt $PKG"
+    die "-----> Could not find prebuilt $BIN"
   fi
 else
-  echo "-----> Restoring cached $PKG"
-  cp -R $CACHE_DIR/$PKG/dbapi $BUILD_DIR
+  echo "-----> Restoring cached $BIN"
+  cp -R $CACHE_DIR/$BIN $BUILD_DIR
 fi
 
 echo "-----> Installing sqitch"
@@ -56,7 +55,7 @@ sqitch config core.pg.target heroku_db
 
 echo "-----> Creating Procfile"
 cat <<EOF > $BUILD_DIR/Procfile
-./dbapi -p \$PORT -d \$DATABASE_URL -a $ANONYMOUS_ROLE
+./${BIN} -p \$PORT -d \$DATABASE_URL -a $ANONYMOUS_ROLE
 EOF
 
 echo "-----> ❤ stay declarative ❤"
