@@ -46,7 +46,7 @@ else
 fi
 
 echo "-----> Installing sqitch"
-sudo apt-get install sqitch
+apt-get install sqitch
 
 echo "-----> Adding sqitch database target"
 sqitch target add heroku_db $DATABASE_URL
