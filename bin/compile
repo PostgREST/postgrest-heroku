@@ -46,7 +46,7 @@ else
 fi
 
 echo "-----> Installing sqitch"
-apt-get install sqitch
+cpan -y App::Sqitch DBD::Pg
 
 echo "-----> Adding sqitch database target"
 sqitch target add heroku_db $DATABASE_URL
