@@ -100,7 +100,7 @@ sqitch config core.pg.target heroku_db
 
 echo "-----> Creating Procfile"
 cat <<EOF > $BUILD_DIR/Procfile
-./${BIN} -p \$PORT -d \$DATABASE_URL -a $ANONYMOUS_ROLE
+./${BIN} -p \$PORT -d \$DATABASE_URL -a $ANONYMOUS_ROLE -c $SSL_CERT -k $SSL_KEY
 EOF
 
 echo "-----> Persisting settings"
