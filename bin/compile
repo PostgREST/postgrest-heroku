@@ -103,4 +103,15 @@ cat <<EOF > $BUILD_DIR/Procfile
 ./${BIN} -p \$PORT -d \$DATABASE_URL -a $ANONYMOUS_ROLE
 EOF
 
+echo "-----> Persisting settings"
+PROFILE_PATH="$BUILD_DIR/.profile.d/dbapi.sh"
+mkdir -p $(dirname $PROFILE_PATH)
+# Usage: $ set-default-env key value
+function set-default-env (){
+  echo "export $1=\${$1:-$2}" >> $PROFILE_PATH
+}
+
+set-default-env LD_LIBRARY_PATH /app/ghc-libs:/usr/lib
+set-default-env PERL5LIB /app/local/lib/perl5
+
 echo "-----> ❤ stay declarative ❤"
