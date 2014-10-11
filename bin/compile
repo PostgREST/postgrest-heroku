@@ -57,6 +57,23 @@ if [ -d $BUILD_DIR/local ]; then
   cp -a $BUILD_DIR/local $CACHE_DIR/local
 fi
 
+############# LIBRARY FILES ###############################
+
+if [ ! -e $CACHE_DIR/ghc-libs ]; then
+  LIBS_URL="http://bin.begriffs.com/dbapi/heroku/ghc-libs.tar.xz"
+  if curl --output /dev/null --silent --head --fail $LIBS_URL; then
+    echo "-----> Downloading and caching libraries for DBAPI"
+    mkdir -p $CACHE_DIR
+    curl -# -L $LIBS_URL | tar xJ -C $CACHE_DIR
+    cp -R $CACHE_DIR/ghc-libs $BUILD_DIR
+  else
+    die "-----> Could not find prebuilt libraries"
+  fi
+else
+  echo "-----> Restoring cached libraries"
+  cp -R $CACHE_DIR/ghc-libs $BUILD_DIR
+fi
+
 ############# DBAPI BINARY ################################
 
 BIN="dbapi-${DBAPI_VER}"
