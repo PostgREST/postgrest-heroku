@@ -1,8 +1,0 @@
-#!/bin/sh
-
-cat << EOF
----
-addons:
-config_vars:
-  PATH: local/bin:/usr/local/bin:/usr/bin:/bin
-EOF
