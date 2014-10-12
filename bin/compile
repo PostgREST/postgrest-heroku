@@ -66,7 +66,7 @@ fi
 
 echo "-----> Creating Procfile"
 cat <<EOF > $BUILD_DIR/Procfile
-web: ./${BIN} -p \$PORT -d \$DATABASE_URL -a $ANONYMOUS_ROLE -c $SSL_CERT -k $SSL_KEY
+web: ./${BIN} -p \$PORT -d \$DATABASE_URL -a \$ANONYMOUS_ROLE -c \$SSL_CERT -k \$SSL_KEY
 EOF
 
 echo "-----> Persisting settings"
