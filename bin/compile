@@ -59,10 +59,10 @@ if [ ! -e $CACHE_DIR/$BIN ]; then
   else
     die "-----> Could not find prebuilt $BIN"
   fi
-else
-  echo "-----> Restoring cached $BIN"
-  cp -R $CACHE_DIR/$BIN $BUILD_DIR
 fi
+
+echo "-----> Restoring cached $BIN"
+cp -R $CACHE_DIR/$BIN $BUILD_DIR
 
 echo "-----> Creating Procfile"
 cat <<EOF > $BUILD_DIR/Procfile
