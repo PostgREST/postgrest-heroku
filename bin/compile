@@ -9,7 +9,7 @@ BUILD_DIR="$1"
 CACHE_DIR="$2"
 ENV_DIR="$3"
 
-DBAPI_VER=${DBAPI_VER:-0.1.0.0}
+DBAPI_VER=${DBAPI_VER:-0.2.0.0}
 
 export_env_dir() {
   local env_dir=${1:-$ENV_DIR}
@@ -66,7 +66,7 @@ fi
 
 echo "-----> Creating Procfile"
 cat <<EOF > $BUILD_DIR/Procfile
-web: ./${BIN} -p \$PORT -d \$DATABASE_URL -a \$ANONYMOUS_ROLE -c \$SSL_CERT -k \$SSL_KEY
+web: ./${BIN} -p \$PORT -d \$DATABASE_URL -a \$ANONYMOUS_ROLE -s
 EOF
 
 echo "-----> Persisting settings"
