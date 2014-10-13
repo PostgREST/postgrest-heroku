@@ -10,3 +10,6 @@ heroku config:set ANONYMOUS_ROLE=foo
 
 git push heroku master
 ```
+
+Be sure to include a `?connect_timeout=5` parameter to the postgres connection
+uri to prevent the app from hanging when being awoken from dyno sleep.
