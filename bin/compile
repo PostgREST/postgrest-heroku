@@ -10,6 +10,7 @@ CACHE_DIR="$2"
 ENV_DIR="$3"
 
 DBAPI_VER=${DBAPI_VER:-0.2.0.0}
+CLEAR_CACHE=${CLEAR_CACHE:-0}
 
 export_env_dir() {
   local env_dir=${1:-$ENV_DIR}
@@ -28,6 +29,11 @@ export_env_dir() {
 }
 
 export_env_dir
+
+if [[ $CLEAR_CACHE -eq 1 ]] ; then
+  echo "-----> Clearing the buildpack cache"
+  rm -fr $CACHE_DIR/
+fi
 
 ############# LIBRARY FILES ###############################
 
