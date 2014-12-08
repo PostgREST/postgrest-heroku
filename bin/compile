@@ -72,7 +72,7 @@ cp -R $CACHE_DIR/$BIN $BUILD_DIR
 
 echo "-----> Creating Procfile"
 cat <<EOF > $BUILD_DIR/Procfile
-web: ./${BIN} -p \$PORT -d \$DATABASE_URL -a \$ANONYMOUS_ROLE -s --db-pool \$DB_POOL
+web: ./${BIN} -p \$PORT -s -d \$DB_NAME -U \$AUTH_ROLE --db-pass \$AUTH_PASS -a \$ANONYMOUS_ROLE -h \$DB_HOST -P \$DB_PORT --db-pool \$DB_POOL
 EOF
 
 echo "-----> Persisting settings"
