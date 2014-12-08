@@ -9,7 +9,7 @@ BUILD_DIR="$1"
 CACHE_DIR="$2"
 ENV_DIR="$3"
 
-DBAPI_VER=${DBAPI_VER:-0.2.0.0}
+POSTGREST_VER=${POSTGREST_VER:-0.2.4.6}
 CLEAR_CACHE=${CLEAR_CACHE:-0}
 
 export_env_dir() {
@@ -40,7 +40,7 @@ fi
 if [ ! -e $CACHE_DIR/ghc-libs ]; then
   LIBS_URL="http://bin.begriffs.com/dbapi/heroku/ghc-libs.tar.xz"
   if curl --output /dev/null --silent --head --fail $LIBS_URL; then
-    echo "-----> Downloading and caching libraries for DBAPI"
+    echo "-----> Downloading and caching libraries for POSTGREST"
     mkdir -p $CACHE_DIR
     curl -# -L $LIBS_URL | tar xJ -C $CACHE_DIR
     cp -R $CACHE_DIR/ghc-libs $BUILD_DIR
@@ -54,12 +54,12 @@ fi
 
 ############# DBAPI BINARY ################################
 
-BIN="dbapi-${DBAPI_VER}"
+BIN="dbapi-${POSTGREST_VER}"
 
 if [ ! -e $CACHE_DIR/$BIN ]; then
   BIN_URL="http://bin.begriffs.com/dbapi/heroku/${BIN}.tar.xz"
   if curl --output /dev/null --silent --head --fail $BIN_URL; then
-    echo "-----> Downloading and caching DBAPI $DBAPI_VER binary"
+    echo "-----> Downloading and caching POSTGREST $POSTGREST_VER binary"
     mkdir -p $CACHE_DIR
     curl -# -L $BIN_URL | tar xJ -C $CACHE_DIR
   else
