@@ -45,7 +45,8 @@ if [ ! -e $CACHE_DIR/ghc-libs ]; then
     curl -# -L $LIBS_URL | tar xJ -C $CACHE_DIR
     cp -R $CACHE_DIR/ghc-libs $BUILD_DIR
   else
-    die "-----> Could not find prebuilt libraries"
+    echo "-----> Could not find prebuilt libraries"
+    exit 1
   fi
 else
   echo "-----> Restoring cached libraries"
@@ -54,7 +55,7 @@ fi
 
 ############# DBAPI BINARY ################################
 
-BIN="dbapi-${POSTGREST_VER}"
+BIN="postgrest-${POSTGREST_VER}"
 
 if [ ! -e $CACHE_DIR/$BIN ]; then
   BIN_URL="http://bin.begriffs.com/dbapi/heroku/${BIN}.tar.xz"
@@ -63,7 +64,8 @@ if [ ! -e $CACHE_DIR/$BIN ]; then
     mkdir -p $CACHE_DIR
     curl -# -L $BIN_URL | tar xJ -C $CACHE_DIR
   else
-    die "-----> Could not find prebuilt $BIN"
+    echo "-----> Could not find prebuilt $BIN"
+    exit 1
   fi
 fi
 
