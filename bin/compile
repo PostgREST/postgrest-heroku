@@ -9,8 +9,12 @@ BUILD_DIR="$1"
 CACHE_DIR="$2"
 ENV_DIR="$3"
 
-POSTGREST_VER=${POSTGREST_VER:-0.2.11.1}
+POSTGREST_VER=${POSTGREST_VER:-0.3.0.0}
 CLEAR_CACHE=${CLEAR_CACHE:-0}
+
+legacyMode() {
+  [[ $POSTGREST_VER == "0.2*" ]]
+}
 
 export_env_dir() {
   local env_dir=${1:-$ENV_DIR}
@@ -55,7 +59,11 @@ fi
 
 ############# DBAPI BINARY ################################
 
-BIN="postgrest-${POSTGREST_VER}"
+if legacyMode; then
+  BIN="postgrest-${POSTGREST_VER}"
+else
+  BIN="postgrest"
+fi
 
 if [ ! -e $CACHE_DIR/$BIN ]; then
   BIN_URL="http://bin.begriffs.com/dbapi/heroku/${BIN}.tar.xz"
@@ -73,9 +81,15 @@ echo "-----> Restoring cached $BIN"
 cp -R $CACHE_DIR/$BIN $BUILD_DIR
 
 echo "-----> Creating Procfile"
-cat <<EOF > $BUILD_DIR/Procfile
+if legacyMode; then
+  cat <<EOF > $BUILD_DIR/Procfile
 web: ./${BIN} -p \$PORT -s -d \$DB_NAME -U \$AUTH_ROLE --db-pass \$AUTH_PASS -a \$ANONYMOUS_ROLE --db-host \$DB_HOST -P \$DB_PORT --db-pool \$DB_POOL --jwt-secret \$JWT_SECRET --v1schema \$V1SCHEMA
 EOF
+else
+  cat <<EOF > $BUILD_DIR/Procfile
+./${BIN} postgres://$DB_ROLE@$DB_HOST:$DB_PORT/$DB_NAME -p \$PORT -s -a \$ANONYMOUS_ROLE --pool \$DB_POOL --jwt-secret \$JWT_SECRET --schema \$SCHEMA
+EOF
+fi
 
 echo "-----> Persisting settings"
 PROFILE_PATH="$BUILD_DIR/.profile.d/dbapi.sh"
