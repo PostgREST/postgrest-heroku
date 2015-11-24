@@ -64,9 +64,10 @@ if legacyMode; then
 else
   BIN="postgrest"
 fi
+FILE="postgrest-${POSTGREST_VER}"
 
 if [ ! -e $CACHE_DIR/$BIN ]; then
-  BIN_URL="http://bin.begriffs.com/dbapi/heroku/${BIN}.tar.xz"
+  BIN_URL="http://bin.begriffs.com/dbapi/heroku/${FILE}.tar.xz"
   if curl --output /dev/null --silent --head --fail $BIN_URL; then
     echo "-----> Downloading and caching POSTGREST $POSTGREST_VER binary"
     mkdir -p $CACHE_DIR
