@@ -28,7 +28,7 @@ heroku config:set DB_HOST=foo.rds.amazonaws.com
 heroku config:set DB_PORT=5432
 heroku config:set DB_POOL=10
 
-heroku config:set POSTGREST_VER=0.3.0.0
+heroku config:set POSTGREST_VER=0.3.2.0
 
 git push heroku master
 ```
