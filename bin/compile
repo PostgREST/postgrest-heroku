@@ -8,12 +8,16 @@ set -o pipefail   # do not ignore exit codes when piping output
 BUILD_DIR="$1"
 CACHE_DIR="$2"
 ENV_DIR="$3"
+BP_DIR=`cd $(dirname $0); cd ..; pwd`
 
-POSTGREST_VER=${POSTGREST_VER:-0.3.2.0}
+POSTGREST_VER=${POSTGREST_VER:-0.4.0.0}
 CLEAR_CACHE=${CLEAR_CACHE:-0}
 
-legacyMode() {
+ver20() {
   [[ $POSTGREST_VER == "0.2*" ]]
+}
+ver30() {
+  [[ $POSTGREST_VER == "0.3*" ]]
 }
 
 export_env_dir() {
@@ -59,7 +63,7 @@ fi
 
 ############# DBAPI BINARY ################################
 
-if legacyMode; then
+if ver20; then
   BIN="postgrest-${POSTGREST_VER}"
 else
   BIN="postgrest"
@@ -81,14 +85,22 @@ fi
 echo "-----> Restoring cached $BIN"
 cp -R $CACHE_DIR/$BIN $BUILD_DIR
 
+echo "-----> Copying the config file builder"
+cp $BP_DIR/env-to-config $BUILD_DIR
+chmod +x $BUILD_DIR/env-to-config
+
 echo "-----> Creating Procfile"
-if legacyMode; then
+if ver20; then
   cat <<EOF > $BUILD_DIR/Procfile
 web: ./${BIN} -p \$PORT -s -d \$DB_NAME -U \$AUTH_ROLE --db-pass "\$AUTH_PASS" -a \$ANONYMOUS_ROLE --db-host \$DB_HOST -P \$DB_PORT --db-pool \$DB_POOL --jwt-secret \$JWT_SECRET --v1schema \$SCHEMA
 EOF
-else
+elif ver30; then
   cat <<EOF > $BUILD_DIR/Procfile
 web: ./${BIN} "postgres://$AUTH_ROLE:$AUTH_PASS@$DB_HOST:$DB_PORT/$DB_NAME" -p \$PORT -a \$ANONYMOUS_ROLE --pool \$DB_POOL --jwt-secret \$JWT_SECRET --schema \$SCHEMA
+EOF
+else
+  cat <<EOF > $BUILD_DIR/Procfile
+web: ./env-to-config ./${BIN} postgrest.conf
 EOF
 fi
 

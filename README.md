@@ -17,18 +17,14 @@ and run these commands.
 
 ```bash
 # first set up a new app
-heroku create --stack=cedar --buildpack https://github.com/begriffs/postgrest-heroku.git
+heroku apps:create --buildpack https://github.com/begriffs/postgrest-heroku.git#fix-0.4
 
 # now fill in the values specific to your database
-heroku config:set AUTH_ROLE=foo
-heroku config:set AUTH_PASS=abc
-heroku config:set ANONYMOUS_ROLE=bar
-heroku config:set DB_NAME=my_db
-heroku config:set DB_HOST=foo.rds.amazonaws.com
-heroku config:set DB_PORT=5432
-heroku config:set DB_POOL=10
-
-heroku config:set POSTGREST_VER=0.3.2.0
+heroku config:set POSTGREST_DB_URI=postgres://postgrest_test:postgrest111@postgrest-test.crbxuv1p3j1c.us-west-1.rds.amazonaws.com/postgrest_test
+heroku config:set POSTGREST_DB_SCHEMA=public
+heroku config:set POSTGREST_DB_ANON_ROLE=postgrest_test
+heroku config:set POSTGREST_DB_POOL=60
+heroku config:set POSTGREST_VER=0.4.0.0
 
 git push heroku master
 ```
