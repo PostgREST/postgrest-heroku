@@ -10,7 +10,7 @@ config_settings=(
   db-pool
   server-host
   server-port
-  server-proxy-url
+  server-proxy-uri
   jwt-secret
   secret-is-base64
   max-rows
