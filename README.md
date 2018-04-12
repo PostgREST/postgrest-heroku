@@ -20,7 +20,7 @@ and run these commands.
 heroku apps:create --buildpack https://github.com/begriffs/postgrest-heroku.git
 
 # now fill in the values specific to your database
-heroku config:set POSTGREST_VER=0.4.0.0
+heroku config:set POSTGREST_VER=0.4.4.0
 heroku config:set DB_URI=postgres://postgrest_test:postgrest111@postgrest-test.crbxuv1p3j1c.us-west-1.rds.amazonaws.com/postgrest_test
 heroku config:set DB_SCHEMA=public
 heroku config:set DB_ANON_ROLE=postgrest_test
