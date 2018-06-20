@@ -68,10 +68,10 @@ if ver20; then
 else
   BIN="postgrest"
 fi
-FILE="postgrest-${POSTGREST_VER}"
+POSTGREST_VER_FULL="v${POSTGREST_VER}"
 
 if [ ! -e $CACHE_DIR/$BIN ]; then
-  BIN_URL="http://bin.begriffs.com/dbapi/heroku/${FILE}.tar.xz"
+  BIN_URL="https://github.com/PostgREST/postgrest/releases/download/${POSTGREST_VER_FULL}/postgrest-${POSTGREST_VER_FULL}-ubuntu.tar.xz"
   if curl --output /dev/null --silent --head --fail $BIN_URL; then
     echo "-----> Downloading and caching PostgREST $POSTGREST_VER binary"
     mkdir -p $CACHE_DIR
