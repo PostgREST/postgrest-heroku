@@ -10,7 +10,7 @@ CACHE_DIR="$2"
 ENV_DIR="$3"
 BP_DIR=`cd $(dirname $0); cd ..; pwd`
 
-POSTGREST_VER=${POSTGREST_VER:-0.4.4.0}
+POSTGREST_VER=${POSTGREST_VER:-0.5.0.0}
 CLEAR_CACHE=${CLEAR_CACHE:-0}
 
 ver20() {
@@ -43,12 +43,12 @@ if [[ $CLEAR_CACHE -eq 1 ]] ; then
   rm -fr $CACHE_DIR/
 fi
 
-############# LIBRARY FILES ###############################
+############# Library files ###############################
 
 if [ ! -e $CACHE_DIR/ghc-libs ]; then
   LIBS_URL="http://bin.begriffs.com/dbapi/heroku/ghc-libs.tar.xz"
   if curl --output /dev/null --silent --head --fail $LIBS_URL; then
-    echo "-----> Downloading and caching libraries for POSTGREST"
+    echo "-----> Downloading and caching libraries for PostgREST"
     mkdir -p $CACHE_DIR
     curl -# -L $LIBS_URL | tar xJ -C $CACHE_DIR
     cp -R $CACHE_DIR/ghc-libs $BUILD_DIR
@@ -61,7 +61,7 @@ else
   cp -R $CACHE_DIR/ghc-libs $BUILD_DIR
 fi
 
-############# DBAPI BINARY ################################
+############# PostgREST binary ################################
 
 if ver20; then
   BIN="postgrest-${POSTGREST_VER}"
@@ -73,7 +73,7 @@ FILE="postgrest-${POSTGREST_VER}"
 if [ ! -e $CACHE_DIR/$BIN ]; then
   BIN_URL="http://bin.begriffs.com/dbapi/heroku/${FILE}.tar.xz"
   if curl --output /dev/null --silent --head --fail $BIN_URL; then
-    echo "-----> Downloading and caching POSTGREST $POSTGREST_VER binary"
+    echo "-----> Downloading and caching PostgREST $POSTGREST_VER binary"
     mkdir -p $CACHE_DIR
     curl -# -L $BIN_URL | tar xJ -C $CACHE_DIR
   else
@@ -105,7 +105,7 @@ EOF
 fi
 
 echo "-----> Persisting settings"
-PROFILE_PATH="$BUILD_DIR/.profile.d/dbapi.sh"
+PROFILE_PATH="$BUILD_DIR/.profile.d/postgrest.sh"
 mkdir -p $(dirname $PROFILE_PATH)
 # Usage: $ set-default-env key value
 function set-default-env (){
