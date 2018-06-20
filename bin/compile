@@ -46,7 +46,7 @@ fi
 ############# Library files ###############################
 
 if [ ! -e $CACHE_DIR/ghc-libs ]; then
-  LIBS_URL="http://bin.begriffs.com/dbapi/heroku/ghc-libs.tar.xz"
+  LIBS_URL="https://github.com/PostgREST/postgrest-heroku/releases/download/v0.4.4.0/ghc-libs.tar.xz"
   if curl --output /dev/null --silent --head --fail $LIBS_URL; then
     echo "-----> Downloading and caching libraries for PostgREST"
     mkdir -p $CACHE_DIR
