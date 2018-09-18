@@ -15,6 +15,7 @@ config_settings=(
   secret-is-base64
   max-rows
   pre-request
+  role-claim-key
 )
 
 for conf in "${config_settings[@]}"; do
