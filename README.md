@@ -5,9 +5,11 @@ The best way to build an API, now for Heroku.
 Make a git repo with anything in it. The repo is just a pretext to
 push to Heroku.
 
-Note that **the Heroku PostgreSQL addon will not work** because it
-does not support having multiple database roles. We recommend
-spinning up a Postgres database with [Amazon
+Note that **the free tier Heroku PostgreSQL addon will not work** because it
+does not support having multiple database roles. **Heroku Postgres** paid tiers do support multiple
+database roles though you'll have to create them through [Heroku Postgres Credentials](https://devcenter.heroku.com/articles/heroku-postgresql-credentials).
+
+We recommend spinning up a Postgres database with [Amazon
 RDS](https://aws.amazon.com/rds/). Make sure you create it in
 the **Virginia region** because that's where Heroku's dynos are
 and it will decrease latency between the server and db.
