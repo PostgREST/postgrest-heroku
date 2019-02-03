@@ -82,7 +82,9 @@ if [ ! -e $CACHE_DIR/$BIN ]; then
     echo "-----> Downloading and caching PostgREST $POSTGREST_VER binary"
     mkdir -p $CACHE_DIR
     curl -# -L $BIN_URL | tar xJ -C $CACHE_DIR
-    mv $CACHE_DIR/postgrest $CACHE_DIR/$BIN
+    if ! ver20; then
+      mv $CACHE_DIR/postgrest $CACHE_DIR/$BIN
+    fi
   else
     echo "-----> Could not find prebuilt $BIN"
     exit 1
