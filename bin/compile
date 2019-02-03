@@ -68,11 +68,7 @@ fi
 
 ############# PostgREST binary ################################
 
-if ver20; then
-  BIN="postgrest-${POSTGREST_VER}"
-else
-  BIN="postgrest"
-fi
+BIN="postgrest-${POSTGREST_VER}"
 
 if ver20 || ver30 || ver40to42; then
   RELEASE_VER="${POSTGREST_VER}"
