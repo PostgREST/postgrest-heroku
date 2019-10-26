@@ -12,6 +12,7 @@ config_settings=(
   server-port
   server-proxy-uri
   jwt-secret
+  jwt-aud
   secret-is-base64
   max-rows
   pre-request
