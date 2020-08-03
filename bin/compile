@@ -10,20 +10,10 @@ CACHE_DIR="$2"
 ENV_DIR="$3"
 BP_DIR=`cd $(dirname $0); cd ..; pwd`
 
-POSTGREST_VER=${POSTGREST_VER:-0.5.0.0}
-CLEAR_CACHE=${CLEAR_CACHE:-0}
+POSTGREST_VER=${POSTGREST_VER:-7.0.1}
+RELEASE_VER="v${POSTGREST_VER}"
 
-ver20() {
-  [[ $POSTGREST_VER == "0.2"* ]]
-}
-ver30() {
-  [[ $POSTGREST_VER == "0.3"* ]]
-}
-ver40to42() {
-  [[ $POSTGREST_VER == "0.4.0.0" ]] || \
-  [[ $POSTGREST_VER == "0.4.1.0" ]] || \
-  [[ $POSTGREST_VER == "0.4.2.0" ]]
-}
+CLEAR_CACHE=${CLEAR_CACHE:-0}
 
 export_env_dir() {
   local env_dir=${1:-$ENV_DIR}
@@ -48,33 +38,9 @@ if [[ $CLEAR_CACHE -eq 1 ]] ; then
   rm -fr $CACHE_DIR/
 fi
 
-############# Library files ###############################
-
-if [ ! -e $CACHE_DIR/ghc-libs ]; then
-  LIBS_URL="https://github.com/PostgREST/postgrest-heroku/releases/download/v0.4.4.0/ghc-libs.tar.xz"
-  if curl --output /dev/null --silent --head --fail $LIBS_URL; then
-    echo "-----> Downloading and caching libraries for PostgREST"
-    mkdir -p $CACHE_DIR
-    curl -# -L $LIBS_URL | tar xJ -C $CACHE_DIR
-    cp -R $CACHE_DIR/ghc-libs $BUILD_DIR
-  else
-    echo "-----> Could not find prebuilt libraries"
-    exit 1
-  fi
-else
-  echo "-----> Restoring cached libraries"
-  cp -R $CACHE_DIR/ghc-libs $BUILD_DIR
-fi
-
 ############# PostgREST binary ################################
 
 BIN="postgrest-${POSTGREST_VER}"
-
-if ver20 || ver30 || ver40to42; then
-  RELEASE_VER="${POSTGREST_VER}"
-else
-  RELEASE_VER="v${POSTGREST_VER}"
-fi
 
 if [ ! -e $CACHE_DIR/$BIN ]; then
   BIN_URL="https://github.com/PostgREST/postgrest/releases/download/v${POSTGREST_VER}/postgrest-${RELEASE_VER}-linux-x64-static.tar.xz"
