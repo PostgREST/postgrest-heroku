@@ -26,16 +26,35 @@ We recommend spinning up a Postgres database with
 2.  Create a new Heroku app using this Heroku buildpack:
 
     ```bash
-    heroku apps:create --buildpack https://github.com/formdeploy/postgrest-heroku.git
+    heroku apps:create ${YOUR_APP_NAME} --buildpack https://github.com/formdeploy/postgrest-heroku.git
+    heroku git:remote -a ${YOUR_APP_NAME}
     ```
+
+3.  Create an account on ElephantSQL, and [create an API
+    key](https://customer.elephantsql.com/apikeys) to use the [ElephantSQL
+    customer API](https://docs.elephantsql.com/). Run the following `curl`
+    command in order to create a PostgreSQL instance on ElephantSQL:
+
+    ```bash
+    curl \
+        -u :${YOUR_API_KEY} \
+        -d "name=${YOUR_DB_NAME}&plan=turtle&region=amazon-web-services::us-east-1" \
+        https://customer.elephantsql.com/api/instances
+    ```
+
+    Get the PostgreSQL DB URI from the ElephantSQL console and set as env
+    variable `DB_URI`. Make sure the URI field is expanded before copying.
+
+    Take the database name (with assumed backing role of identical name) and set
+    as env variable `DB_ANON_ROLE`.
 
 3.  Set Heroku environment variables:
 
     ```bash
     heroku config:set POSTGREST_VER=7.0.1
-    heroku config:set DB_URI=postgres://postgrest_test:postgrest111@postgrest-test.crbxuv1p3j1c.us-west-1.rds.amazonaws.com/postgrest_test
+    heroku config:set DB_URI=${DB_URI}
     heroku config:set DB_SCHEMA=public
-    heroku config:set DB_ANON_ROLE=postgrest_test
+    heroku config:set DB_ANON_ROLE=${DB_ANON_ROLE}
     heroku config:set DB_POOL=60
     ```
 
@@ -44,6 +63,8 @@ We recommend spinning up a Postgres database with
     ```bash
     git push heroku master
     ```
+
+Your Heroku app should be live at `${YOUR_APP_NAME}.herokuapp.com`.
 
 ### Configuring PostgreSQL
 
