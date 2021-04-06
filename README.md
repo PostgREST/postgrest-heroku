@@ -28,7 +28,7 @@ heroku config:set DB_SCHEMA=public
 heroku config:set DB_ANON_ROLE=postgrest_test
 heroku config:set DB_POOL=60
 
-git push heroku master
+git push heroku main
 ```
 
 To determine the best value for `DB_POOL` ask the database by
