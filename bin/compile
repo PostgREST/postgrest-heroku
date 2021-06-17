@@ -10,7 +10,7 @@ CACHE_DIR="$2"
 ENV_DIR="$3"
 BP_DIR=`cd $(dirname $0); cd ..; pwd`
 
-POSTGREST_VER=${POSTGREST_VER:-0.5.0.0}
+POSTGREST_VER=${POSTGREST_VER:-7.0.1}
 CLEAR_CACHE=${CLEAR_CACHE:-0}
 
 ver20() {
@@ -23,6 +23,10 @@ ver40to42() {
   [[ $POSTGREST_VER == "0.4.0.0" ]] || \
   [[ $POSTGREST_VER == "0.4.1.0" ]] || \
   [[ $POSTGREST_VER == "0.4.2.0" ]]
+}
+ver_below_6() {
+  [[ $POSTGREST_VER == "0."* ]] || \
+  [[ $POSTGREST_VER == "5."* ]]
 }
 
 export_env_dir() {
@@ -76,8 +80,14 @@ else
   RELEASE_VER="v${POSTGREST_VER}"
 fi
 
+if ver_below_6; then
+  FILE_SUFFIX="ubuntu"
+else
+  FILE_SUFFIX="linux-x64-static"
+fi
+
 if [ ! -e $CACHE_DIR/$BIN ]; then
-  BIN_URL="https://github.com/PostgREST/postgrest/releases/download/v${POSTGREST_VER}/postgrest-${RELEASE_VER}-ubuntu.tar.xz"
+  BIN_URL="https://github.com/PostgREST/postgrest/releases/download/v${POSTGREST_VER}/postgrest-${RELEASE_VER}-${FILE_SUFFIX}.tar.xz"
   if curl --output /dev/null --silent --head --fail $BIN_URL; then
     echo "-----> Downloading and caching PostgREST $POSTGREST_VER binary"
     mkdir -p $CACHE_DIR
