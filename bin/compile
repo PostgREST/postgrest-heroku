@@ -86,7 +86,7 @@ fi
 
 if ver_below_6; then
   FILE_SUFFIX="ubuntu"
-else if ver_below_8; then
+elif ver_below_8; then
   FILE_SUFFIX="linux-x64-static"
 else
   FILE_SUFFIX="linux-static-x64"
