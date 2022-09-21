@@ -14,6 +14,7 @@ config_settings=(
   server-port
   server-unix-socket
   server-unix-socket-mode
+  openapi-mode
   openapi-server-proxy-uri
   server-proxy-uri
   jwt-secret
