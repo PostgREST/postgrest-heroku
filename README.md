@@ -90,7 +90,7 @@ Credentials](https://devcenter.heroku.com/articles/heroku-postgresql-credentials
     git push heroku master
     ```
 
-Your Heroku app should be live at `${YOUR_APP_NAME}.herokuapp.com`.
+    Your Heroku app should be live at `${YOUR_APP_NAME}.herokuapp.com`
 
 7.  Test your app
 
