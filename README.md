@@ -4,8 +4,11 @@ The best way to build an API, now for Heroku.
 
 Updated for PostgREST >= v9.0.0
 
-NOTE: **The free tier Heroku PostgreSQL addon will work with some limitations** because it does
-not support having multiple database roles. **Heroku Postgres** paid tiers do
+NOTE: 
+
+**The free and hobby Heroku PostgreSQL add-on** do not support having multiple database roles (e.g. read-only or read-write roles). 
+
+**Heroku Postgres paid tiers** do
 support multiple database roles, though you'll have to create them through
 [Heroku Postgres
 Credentials](https://devcenter.heroku.com/articles/heroku-postgresql-credentials) as explained below.
@@ -91,6 +94,7 @@ Credentials](https://devcenter.heroku.com/articles/heroku-postgresql-credentials
 Your Heroku app should be live at `${YOUR_APP_NAME}.herokuapp.com`.
 
 7.  Test your app
+
     From a terminal display the application logs:
     ```bash
     heroku logs -t
