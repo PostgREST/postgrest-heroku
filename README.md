@@ -33,6 +33,7 @@ Credentials](https://devcenter.heroku.com/articles/heroku-postgresql-credentials
 3.  Create a new Heroku Postgres add-on attached to the app and keep notes of the assigned add-on name (e.g. postgresql-curly-58902) referred later as ${HEROKU_PG_DB_NAME}
     ```bash
     heroku addons:create heroku-postgresql:standard-0 -a ${YOUR_APP_NAME}
+    # wait until the add-on is available
     heroku pg:wait -a ${YOUR_APP_NAME}
     ```
 
