@@ -75,8 +75,8 @@ if [ ! -e $CACHE_DIR/$BIN ]; then
   fi
 fi
 
-# echo "-----> Restoring cached $BIN"
-# cp -R $CACHE_DIR/$BIN $BUILD_DIR
+echo "-----> Restoring cached $BIN"
+cp -R $CACHE_DIR/$BIN $BUILD_DIR
 
 # echo "-----> Persisting settings"
 # PROFILE_PATH="$BUILD_DIR/.profile.d/postgrest.sh"
