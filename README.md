@@ -81,8 +81,8 @@ Credentials](https://devcenter.heroku.com/articles/heroku-postgresql-credentials
     Set the following environment variables on Heroku - POSTGREST_VER is mandatory to select and build the required PostgREST release:
     ```
     heroku config:set POSTGREST_VER=10.0.0
-    heroku config:set DB_SCHEMA=api
-    heroku config:set DB_ANON_ROLE=api_user
+    heroku config:set PGRST_DB_SCHEMA=api
+    heroku config:set PGRST_DB_ANON_ROLE=api_user
     ```
 
     See https://postgrest.org/en/stable/configuration.html#environment-variables for the full list of environment variables.
