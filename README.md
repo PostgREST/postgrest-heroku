@@ -42,6 +42,9 @@ Credentials](https://devcenter.heroku.com/articles/heroku-postgresql-credentials
 
     ```bash
     heroku pg:credentials:create --name api_user -a ${YOUR_APP_NAME}
+    # use the following command to ensure the new credential state is active before attaching it
+    heroku pg:credentials -a ${YOUR_APP_NAME}
+
     heroku addons:attach ${HEROKU_PG_DB_NAME} --credential api_user -a ${YOUR_APP_NAME}
     ```
 
