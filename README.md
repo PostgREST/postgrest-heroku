@@ -1,12 +1,8 @@
 ## PostgREST on Heroku
 
-The best way to build an API, now for Heroku.
+The best way to build an API, now for Heroku. Updated for PostgREST >= v9.0.0
 
-Updated for PostgREST >= v9.0.0
-
-NOTE: 
-
-**The free and hobby Heroku PostgreSQL add-on** do not support having multiple database roles (e.g. read-only or read-write roles). 
+**Free and hobby Heroku PostgreSQL add-on** do not support having multiple database roles (e.g. read-only or read-write roles). 
 
 **Heroku Postgres paid tiers** do
 support multiple database roles, though you'll have to create them through
