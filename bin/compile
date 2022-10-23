@@ -88,7 +88,7 @@ function set-default-env (){
 
 set-default-env LD_LIBRARY_PATH /app/ghc-libs:/usr/lib
 
-echo "Edit your Procfile as follows"
+echo "-----> Remember to edit your Procfile as follows"
 echo "web: PGRST_SERVER_HOST=0.0.0.0 PGRST_SERVER_PORT=\${PORT} PGRST_DB_URI=\${PGRST_DB_URI:-\${DATABASE_URL}} ./postgrest-\${POSTGREST_VER}"
 
 echo "-----> ❤ stay declarative ❤"
