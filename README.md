@@ -78,7 +78,7 @@ Credentials](https://devcenter.heroku.com/articles/heroku-postgresql-credentials
     web: PGRST_SERVER_HOST=0.0.0.0 PGRST_SERVER_PORT=${PORT} PGRST_DB_URI=${PGRST_DB_URI:-${DATABASE_URL}} ./postgrest-${POSTGREST_VER}
     ```
 
-    Set the following environment variables on Heroku - POSTGREST_VER is mandatory to select and build the required PostgREST release:
+    Set the following environment variables on Heroku. PGRST_DB_URI can be set if an external database is used or if it's different from the default Heroku DATABASE_URL - POSTGREST_VER is mandatory to select and build the required PostgREST release:
     ```
     heroku config:set POSTGREST_VER=10.0.0
     heroku config:set PGRST_DB_SCHEMA=api
