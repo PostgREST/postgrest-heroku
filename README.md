@@ -49,7 +49,10 @@ Credentials](https://devcenter.heroku.com/articles/heroku-postgresql-credentials
     heroku psql -a ${YOUR_APP_NAME}
     ```
 
-    ```
+    ```sql
+    # from the psql command prompt execute the following commands:
+    create schema api;
+
     create table api.todos (
     id serial primary key,
     done boolean not null default false,
