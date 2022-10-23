@@ -36,24 +36,6 @@ if [[ $CLEAR_CACHE -eq 1 ]] ; then
   rm -fr $CACHE_DIR/
 fi
 
-############# Library files ###############################
-
-# if [ ! -e $CACHE_DIR/ghc-libs ]; then
-#   LIBS_URL="https://github.com/PostgREST/postgrest-heroku/releases/download/v0.4.4.0/ghc-libs.tar.xz"
-#   if curl --output /dev/null --silent --head --fail $LIBS_URL; then
-#     echo "-----> Downloading and caching libraries for PostgREST"
-#     mkdir -p $CACHE_DIR
-#     curl -# -L $LIBS_URL | tar xJ -C $CACHE_DIR
-#     cp -R $CACHE_DIR/ghc-libs $BUILD_DIR
-#   else
-#     echo "-----> Could not find prebuilt libraries"
-#     exit 1
-#   fi
-# else
-#   echo "-----> Restoring cached libraries"
-#   cp -R $CACHE_DIR/ghc-libs $BUILD_DIR
-# fi
-
 ############# PostgREST binary ################################
 
 BIN="postgrest-${POSTGREST_VER}"
@@ -78,17 +60,7 @@ fi
 echo "-----> Restoring cached $BIN"
 cp -R $CACHE_DIR/$BIN $BUILD_DIR
 
-# echo "-----> Persisting settings"
-# PROFILE_PATH="$BUILD_DIR/.profile.d/postgrest.sh"
-# mkdir -p $(dirname $PROFILE_PATH)
-# # Usage: $ set-default-env key value
-# function set-default-env (){
-#   echo "export $1=\${$1:-$2}" >> $PROFILE_PATH
-# }
-
-# set-default-env LD_LIBRARY_PATH /app/ghc-libs:/usr/lib
-
 echo "-----> Remember to edit your Procfile as follows"
-echo "web: PGRST_SERVER_HOST=0.0.0.0 PGRST_SERVER_PORT=\${PORT} PGRST_DB_URI=\${PGRST_DB_URI:-\${DATABASE_URL}} ./postgrest-\${POSTGREST_VER}"
+echo "       web: PGRST_SERVER_HOST=0.0.0.0 PGRST_SERVER_PORT=\${PORT} PGRST_DB_URI=\${PGRST_DB_URI:-\${DATABASE_URL}} ./postgrest-\${POSTGREST_VER}"
 
 echo "-----> ❤ stay declarative ❤"
