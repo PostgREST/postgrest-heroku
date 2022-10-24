@@ -10,38 +10,18 @@ CACHE_DIR="$2"
 ENV_DIR="$3"
 BP_DIR=`cd $(dirname $0); cd ..; pwd`
 
-POSTGREST_VER=${POSTGREST_VER:-9.0.1}
+POSTGREST_VER=${POSTGREST_VER:-10.0.0}
 CLEAR_CACHE=${CLEAR_CACHE:-0}
-
-ver20() {
-  [[ $POSTGREST_VER == "0.2"* ]]
-}
-ver30() {
-  [[ $POSTGREST_VER == "0.3"* ]]
-}
-ver40to42() {
-  [[ $POSTGREST_VER == "0.4.0.0" ]] || \
-  [[ $POSTGREST_VER == "0.4.1.0" ]] || \
-  [[ $POSTGREST_VER == "0.4.2.0" ]]
-}
-ver_below_6() {
-  [[ $POSTGREST_VER == "0."* ]] || \
-  [[ $POSTGREST_VER == "5."* ]]
-}
-ver_below_8() {
-  [[ $POSTGREST_VER == "0."* ]] || \
-  [[ $POSTGREST_VER == "7."* ]]
-}
 
 export_env_dir() {
   local env_dir=${1:-$ENV_DIR}
-  local whitelist_regex=${2:-''}
-  local blacklist_regex=${3:-'^(PATH|GIT_DIR|CPATH|CPPATH|LD_PRELOAD|LIBRARY_PATH|BUILDPACK_URL)$'}
+  local allowlist_regex=${2:-''}
+  local blocklist_regex=${3:-'^(PATH|GIT_DIR|CPATH|CPPATH|LD_PRELOAD|LIBRARY_PATH|BUILDPACK_URL)$'}
 
   if [ -d "$env_dir" ]; then
     echo "-----> Exporting config vars"
     for e in $(ls $env_dir); do
-      echo "$e" | grep -E "$whitelist_regex" | grep -qvE "$blacklist_regex" &&
+      echo "$e" | grep -E "$allowlist_regex" | grep -qvE "$blocklist_regex" &&
         echo "       $e" &&
         export "$e=$(cat $env_dir/$e)"
       :
@@ -56,41 +36,13 @@ if [[ $CLEAR_CACHE -eq 1 ]] ; then
   rm -fr $CACHE_DIR/
 fi
 
-############# Library files ###############################
-
-if [ ! -e $CACHE_DIR/ghc-libs ]; then
-  LIBS_URL="https://github.com/PostgREST/postgrest-heroku/releases/download/v0.4.4.0/ghc-libs.tar.xz"
-  if curl --output /dev/null --silent --head --fail $LIBS_URL; then
-    echo "-----> Downloading and caching libraries for PostgREST"
-    mkdir -p $CACHE_DIR
-    curl -# -L $LIBS_URL | tar xJ -C $CACHE_DIR
-    cp -R $CACHE_DIR/ghc-libs $BUILD_DIR
-  else
-    echo "-----> Could not find prebuilt libraries"
-    exit 1
-  fi
-else
-  echo "-----> Restoring cached libraries"
-  cp -R $CACHE_DIR/ghc-libs $BUILD_DIR
-fi
-
 ############# PostgREST binary ################################
 
 BIN="postgrest-${POSTGREST_VER}"
 
-if ver20 || ver30 || ver40to42; then
-  RELEASE_VER="${POSTGREST_VER}"
-else
-  RELEASE_VER="v${POSTGREST_VER}"
-fi
+RELEASE_VER="v${POSTGREST_VER}"
 
-if ver_below_6; then
-  FILE_SUFFIX="ubuntu"
-elif ver_below_8; then
-  FILE_SUFFIX="linux-x64-static"
-else
-  FILE_SUFFIX="linux-static-x64"
-fi
+FILE_SUFFIX="linux-static-x64"
 
 if [ ! -e $CACHE_DIR/$BIN ]; then
   BIN_URL="https://github.com/PostgREST/postgrest/releases/download/v${POSTGREST_VER}/postgrest-${RELEASE_VER}-${FILE_SUFFIX}.tar.xz"
@@ -98,9 +50,7 @@ if [ ! -e $CACHE_DIR/$BIN ]; then
     echo "-----> Downloading and caching PostgREST $POSTGREST_VER binary"
     mkdir -p $CACHE_DIR
     curl -# -L $BIN_URL | tar xJ -C $CACHE_DIR
-    if ! ver20; then
-      mv $CACHE_DIR/postgrest $CACHE_DIR/$BIN
-    fi
+    mv $CACHE_DIR/postgrest $CACHE_DIR/$BIN
   else
     echo "-----> Could not find prebuilt $BIN"
     exit 1
@@ -110,33 +60,7 @@ fi
 echo "-----> Restoring cached $BIN"
 cp -R $CACHE_DIR/$BIN $BUILD_DIR
 
-echo "-----> Copying the config file builder"
-cp $BP_DIR/env-to-config $BUILD_DIR
-chmod +x $BUILD_DIR/env-to-config
-
-echo "-----> Creating Procfile"
-if ver20; then
-  cat <<EOF > $BUILD_DIR/Procfile
-web: ./${BIN} -p \$PORT -s -d \$DB_NAME -U \$AUTH_ROLE --db-pass "\$AUTH_PASS" -a \$ANONYMOUS_ROLE --db-host \$DB_HOST -P \$DB_PORT --db-pool \$DB_POOL --jwt-secret \$JWT_SECRET --v1schema \$SCHEMA
-EOF
-elif ver30; then
-  cat <<EOF > $BUILD_DIR/Procfile
-web: ./${BIN} "postgres://$AUTH_ROLE:$AUTH_PASS@$DB_HOST:$DB_PORT/$DB_NAME" -p \$PORT -a \$ANONYMOUS_ROLE --pool \$DB_POOL --jwt-secret \$JWT_SECRET --schema \$SCHEMA
-EOF
-else
-  cat <<EOF > $BUILD_DIR/Procfile
-web: ./env-to-config ./${BIN} postgrest.conf
-EOF
-fi
-
-echo "-----> Persisting settings"
-PROFILE_PATH="$BUILD_DIR/.profile.d/postgrest.sh"
-mkdir -p $(dirname $PROFILE_PATH)
-# Usage: $ set-default-env key value
-function set-default-env (){
-  echo "export $1=\${$1:-$2}" >> $PROFILE_PATH
-}
-
-set-default-env LD_LIBRARY_PATH /app/ghc-libs:/usr/lib
+echo "-----> Remember to edit your Procfile as follows"
+echo "       web: PGRST_SERVER_HOST=0.0.0.0 PGRST_SERVER_PORT=\${PORT} PGRST_DB_URI=\${PGRST_DB_URI:-\${DATABASE_URL}} ./postgrest-\${POSTGREST_VER}"
 
 echo "-----> ❤ stay declarative ❤"

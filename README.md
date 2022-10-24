@@ -1,21 +1,13 @@
 ## PostgREST on Heroku
 
-The best way to build an API, now for Heroku.
+The best way to build an API, now for Heroku. Updated for PostgREST >= v9.0.0
 
-Updated for PostgREST v7.0.1.
+**Free and hobby Heroku PostgreSQL add-on** do not support having multiple database roles (e.g. read-only or read-write roles). 
 
-NOTE: **The free tier Heroku PostgreSQL addon will not work** because it does
-not support having multiple database roles. **Heroku Postgres** paid tiers do
+**Heroku Postgres paid tiers** do
 support multiple database roles, though you'll have to create them through
 [Heroku Postgres
-Credentials](https://devcenter.heroku.com/articles/heroku-postgresql-credentials).
-
-We recommend spinning up a Postgres database with [Amazon
-RDS](https://aws.amazon.com/rds/). Make sure you create it in
-the **Virginia region** because that's where Heroku's dynos are
-and it will decrease latency between the server and db.
-
-Alternatively you could create it on [ElephantSQL](https://www.elephantsql.com/) for free tier usage.
+Credentials](https://devcenter.heroku.com/articles/heroku-postgresql-credentials) as explained below.
 
 ### To Deploy PostgREST on Heroku
 
@@ -30,56 +22,96 @@ Alternatively you could create it on [ElephantSQL](https://www.elephantsql.com/)
 2.  Create a new Heroku app using this Heroku buildpack:
 
     ```bash
-    heroku apps:create ${YOUR_APP_NAME} --buildpack https://github.com/PostgREST/postgrest-heroku
+    mkdir ${YOUR_APP_NAME}
+    cd ${YOUR_APP_NAME}
+    git init .
+
+    heroku apps:create ${YOUR_APP_NAME} --buildpack https://github.com/abernicchia-heroku/postgrest-heroku.git
     heroku git:remote -a ${YOUR_APP_NAME}
     ```
 
-3.  Create the necessary user roles according to the 
-    [PostgREST documentation](https://postgrest.org/en/stable/auth.html) and 
-    allow them role switch from the psql console:
+3.  Create a new Heroku Postgres add-on attached to the app and keep notes of the assigned add-on name (e.g. postgresql-curly-58902) referred later as ${HEROKU_PG_DB_NAME}
+    ```bash
+    heroku addons:create heroku-postgresql:standard-0 -a ${YOUR_APP_NAME}
+    # wait until the add-on is available
+    heroku pg:wait -a ${YOUR_APP_NAME}
+    ```
+
+4.  Create the necessary user roles according to the 
+    [PostgREST documentation](https://postgrest.org/en/stable/auth.html):
 
     ```bash
-    GRANT user123 TO authenticator;
-    GRANT web_anon TO authenticator;
+    heroku pg:credentials:create --name api_user -a ${YOUR_APP_NAME}
+    # use the following command to ensure the new credential state is active before attaching it
+    heroku pg:credentials -a ${YOUR_APP_NAME}
+
+    heroku addons:attach ${HEROKU_PG_DB_NAME} --credential api_user -a ${YOUR_APP_NAME}
     ```
 
-4.  Create a configuration file `postgrest.conf`:
+5.  Connect to the Postgres database and create some sample data:
 
     ```bash
-    db-uri = "postgres://authenticator:mysecretpassword@postgresqlserver.com:5432/postgres"
-    db-schema = "api"
-    db-anon-role = "web_anon"
-    db-pool = 10
+    heroku psql -a ${YOUR_APP_NAME}
     ```
-
-    and the `Procfile`:
-
-    ```bash
-    ./env-to-config ./postgrest postgrest.conf
-    ```
-
-    It is also possible to set variables directly on Heroku:
-    ```
-    heroku config:set POSTGREST_VER=0.5.0.0
-    heroku config:set DB_URI=postgres://postgrest_test:postgrest111@postgrest-test.crbxuv1p3j1c.us-west-1.rds.amazonaws.com/postgrest_test
-    heroku config:set DB_SCHEMA=public
-    heroku config:set DB_ANON_ROLE=postgrest_test
-    heroku config:set DB_POOL=60
-    ```
-
-    To determine the best value for PostgREST environment variable `DB_POOL`,
-    ask the database by running this SQL:
 
     ```sql
-    show max_connections;
+    # from the psql command prompt execute the following commands:
+    create schema api;
+
+    create table api.todos (
+    id serial primary key,
+    done boolean not null default false,
+    task text not null,
+    due timestamptz
+    );
+
+    insert into api.todos (task) values
+    ('finish tutorial 0'), ('pat self on back');
+
+    grant usage on schema api to api_user;
+    grant select on api.todos to api_user;
     ```
 
-    See https://postgrest.org/en/stable/configuration.html for the full list of configuration parameters.
-
-5.  Create the Heroku dyno:
+5.  Create the `Procfile`:
 
     ```bash
+    web: PGRST_SERVER_HOST=0.0.0.0 PGRST_SERVER_PORT=${PORT} PGRST_DB_URI=${PGRST_DB_URI:-${DATABASE_URL}} ./postgrest-${POSTGREST_VER}
+    ```
+    Set the following environment variables on Heroku:
+    ```
+    heroku config:set POSTGREST_VER=10.0.0
+    heroku config:set PGRST_DB_SCHEMA=api
+    heroku config:set PGRST_DB_ANON_ROLE=api_user
+    ```
+
+    PGRST_DB_URI can be set if an external database is used or if it's different from the default Heroku DATABASE_URL. This latter is used if nothing is provided.  
+    POSTGREST_VER is mandatory to select and build the required PostgREST release.
+
+    See https://postgrest.org/en/stable/configuration.html#environment-variables for the full list of environment variables.
+
+6.  Build and deploy your app:
+
+    ```bash
+    git add Procfile
+    git commit -m "PostgREST on Heroku"
     git push heroku master
     ```
 
-Your Heroku app should be live at `${YOUR_APP_NAME}.herokuapp.com`.
+    Your Heroku app should be live at `${YOUR_APP_NAME}.herokuapp.com`
+
+7.  Test your app
+
+    From a terminal display the application logs:
+    ```bash
+    heroku logs -t
+    ```
+    From a different terminal retrieve with curl the records previously created:
+    ```bash
+    curl https://${YOUR_APP_NAME}.herokuapp.com/todos
+    ```
+    and test that any attempt to modify the table via a read-only user is not allowed:
+    ```bash
+    curl https://${YOUR_APP_NAME}.herokuapp.com/todos -X POST \
+     -H "Content-Type: application/json" \
+     -d '{"task": "do bad thing"}'
+    ```    
