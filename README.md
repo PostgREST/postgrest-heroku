@@ -26,7 +26,7 @@ Credentials](https://devcenter.heroku.com/articles/heroku-postgresql-credentials
     cd ${YOUR_APP_NAME}
     git init .
 
-    heroku apps:create ${YOUR_APP_NAME} --buildpack https://github.com/abernicchia-heroku/postgrest-heroku.git
+    heroku apps:create ${YOUR_APP_NAME} --buildpack https://github.com/PostgREST/postgrest-heroku.git
     heroku git:remote -a ${YOUR_APP_NAME}
     ```
 
